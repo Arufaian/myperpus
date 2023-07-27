@@ -1,0 +1,7 @@
+{
+  "workbench.iconTheme": "vscode-icons",
+  "editor.fontSize": 15,
+  "workbench.colorTheme": "Dracula",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.wordWrap": "on"
+}
