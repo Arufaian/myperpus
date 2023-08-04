@@ -6,73 +6,12 @@
   }
 
 
-    $Suid = $_SESSION['key'];
-    $data_admin = mysqli_query($conn, "SELECT * FROM anggota WHERE id = $Suid");
-    $baris = mysqli_fetch_assoc($data_admin);
+    $Suid = $_SESSION['id_anggota'];
+    $data_anggota = mysqli_query($conn, "SELECT * FROM anggota WHERE id_anggota = '$Suid'");
+    $baris = mysqli_fetch_assoc($data_anggota);
 
-      if (isset($_POST["submit"])) {
-        // cek apakah data berhasil ditambahkan
-        $nama_peminjam = $_POST['nama_peminjam'];
-        $id_peminjam = $_POST['id_peminjam'];
-        $id_buku = $_POST['id_buku'];
-        $tp = $_POST['tp'];
-        // $tk = $_POST['tk'];
-        $tk = "-";
-
-
-        $status_query = "SELECT status FROM buku WHERE id_buku = '$id_buku'";
-        $status_result = mysqli_query($conn, $status_query);
-        if ($status_result) {
-
-          $row = mysqli_fetch_assoc($status_result);
-          $status_buku = $row['status'];
-
-          if ($status_buku == 'tersedia') {
-            // Status buku Tersedia, lanjutkan proses peminjaman
-            // Kueri untuk menyimpan data peminjaman
-            $query = "INSERT INTO pinjam VALUES ('', '$id_peminjam', '$id_buku', ' $nama_peminjam', '$tp', '$tk')";
-            $result = mysqli_query($conn, $query);
-            $status = "dipinjam";
-
-            if ($result) {
-                // Perbarui status buku menjadi "Disewa"
-                $update_query = "UPDATE buku SET status = '$status' WHERE id_buku = '$id_buku'";
-                $update_result = mysqli_query($conn, $update_query);
-                echo "<script>
-                    alert('buku berhasil dipinjam');
-                    document.location.href = './pinjamBuku.php';
-                </script>";
-
-
-              
-            } else {
-
-              echo "<script>
-                    alert('Gagal melakukan peminjaman buku');
-                    document.location.href = './pinjamBuku.php';
-                </script>";
-              
-            }
-
-          } else {
-              echo "<script>
-                    alert('Buku sedang dipinjam');
-                    document.location.href = './pinjamBuku.php';
-                </script>";
-          }
-
-        } else {
-
-                echo "<script>
-                    alert('Buku sedang dipinjam');
-                    document.location.href = './pinjamBuku.php';
-                </script>";
-        }
-        
-    }
-
-  $books = query("SELECT * FROM buku");
-  $data_pinjam = query("SELECT * FROM pinjam");
+  $data_pinjam = query("SELECT * FROM pinjam WHERE id_peminjam = '$Suid'");
+  // $books = query("SELECT judul FROM buku where id_buku = ''");
   $tanggalHariIni = date("Y-m-d");
 ?>
 
@@ -115,13 +54,13 @@
             <a href="koleksiBuku.php"><i class="bi bi-bookshelf"></i><span>Koleksi buku</span></a>
           </li>
           <li>
-            <a href="#" class="active"><i class="bi bi-journal-arrow-up"></i> <span>Peminjaman</span></a>
+            <a href="pinjamBuku.php"><i class="bi bi-journal-arrow-up"></i> <span>Peminjaman</span></a>
           </li>
           <li>
-            <a href="#"><i class="bi bi-journal-arrow-down"></i> <span>Pengembalian</span></a>
+            <a href="#" class="active"><i class="bi bi-journal-arrow-down"></i> <span>Pengembalian</span></a>
           </li>
           <li>
-          <a href="../config/logoutAnggota.php" onclick="confirm('Apakah anda ingin logout?');"><i class="bi bi-power"></i><span>Logout</span></a>
+            <a href="../config/logoutAnggota.php" onclick="return confirm('Apakah anda ingin Logout?');"><i class="bi bi-power"></i><span>Logout</span></a>
           </li>
         </ul>
       </div>
@@ -133,7 +72,7 @@
           <label for="nav-toggle">
             <i class="bi bi-list"></i>
           </label>
-          Koleksi buku
+          halaman pengembalian
         </h3>
         <div class="search-wrapper">
           <i class="bi bi-search"></i>
@@ -153,8 +92,7 @@
           <div class="projects">
             <div class="crd">
               <div class="crd-head">
-                <h2>Koleksi buku</h2>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambah">Pinjam buku</button>
+                <h2>List buku yang dipinjam</h2>
               </div>
               <div class="crd-body">
                 <div class="table-responsive">
@@ -167,6 +105,8 @@
                         <td>Nama peminjam</td>
                         <td>Tanggal peminjaman</td>
                         <td>Tanggal pengembalian</td>
+                        <td>Status</td>
+                        <td>Aksi</td>
                       </tr>
                     </thead>
 
@@ -180,6 +120,10 @@
                         <td><?= $row['nama_peminjam'] ?></td>
                         <td><?= $row['tp'] ?></td>
                         <td><?= $row['tk'] ?></td>
+                        <td><?= $row['status'] ?></td>
+                        <td>
+                          <button class="btn btn-danger"><a href="../config/proses_pengembalian.php?id_buku=<?= $row['id_buku'] ?>" style="text-decoration: none; color: white;">Kembalikan</a></button>
+                        </td>
                         <?php $i++; ?>
                         <?php endforeach; ?>
                       </tr>
@@ -193,52 +137,7 @@
       </main>
     </div>
 
-        <!-- Modal -->
-    <div class="modal fade" id="tambah" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form method="post" action="" enctype="multipart/form-data">
-            <div class="modal-body">
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="floatingInputDisabled" placeholder="name@example.com" name="nama_peminjam" value="<?= $baris['nama'] ?>"/>
-                <label for="floatingInputDisabled">Nama peminjam</label>
-              </div>
-
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="floatingInputDisabled" placeholder="name@example.com" name="id_peminjam"  value="<?= $baris['id_anggota'] ?>"/>
-                <label for="floatingInputDisabled">id peminjam</label>
-              </div>
-
-              <select class="form-select mb-3" name="id_buku" aria-label="Size 3 select example" required>
-                <option selected>Pilih buku</option>
-                <?php foreach($books as $book): ?>
-                <option value="<?= $book['id_buku'] ?>"><?= $book['id_buku'] ?> (<?= $book['judul'] ?>)</option>
-                <?php endforeach; ?>
-              </select>
-
-            <div class="col-mb-12 mb-3">
-                <label for="formFile" class="form-label">Tanggal peminjaman</label>
-                <input class="form-control" type="date" id="formFile" name="tp" required value="<?= $tanggalHariIni ?>" />
-              </div>
-
-            <div class="col-mb-12 mb-3">
-                <input class="form-control" type="date" id="formFile" name="tk" hidden/>
-              </div>
-            </div>
-
-            <div class="modal-footer">
-              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-
-              <button type="submit" name="submit" class="btn btn-primary">submit</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    
+        <!-- Modal -->    
     <script src="../Bootstrap/bootstrap.bundle.js"></script>
   </body>
 </html>

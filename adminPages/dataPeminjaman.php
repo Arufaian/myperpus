@@ -8,9 +8,13 @@ if (!isset($_SESSION["id"])) {
 $Sid = $_SESSION['id'];
 $data_admin = mysqli_query($conn, "SELECT * FROM admins WHERE id = $Sid");
 $baris = mysqli_fetch_assoc($data_admin);
+// $nama_anggota = mysqli_query($conn, "SELECT nama FROM anggota");
+$data_anggota = query("SELECT * FROM anggota");
+$peminjam = query("SELECT * FROM pinjam");
+$data_buku = query('SELECT * FROM buku');
+$tanggalHariIni = date("Y-m-d");
 
 
-  $peminjam = query("SELECT * FROM pinjam");
 ?>
 
 <!DOCTYPE html>
@@ -59,7 +63,7 @@ $baris = mysqli_fetch_assoc($data_admin);
             <a href="#" class="active"><i class="bi bi-journal-arrow-up"></i><span>Data peminjaman</span></a>
           </li>
           <li>
-            <a href="#"><i class="bi bi-journal-arrow-down"></i><span>Data pengembalian</span></a>
+            <a href="dataPengembalian.php"><i class="bi bi-journal-arrow-down"></i><span>Data pengembalian</span></a>
           </li>
           <li>
             <a href="../config/logout.php" onclick="confirm('Apakah anda ingin logout?');"><i class="bi bi-power"></i><span>Logout</span></a>
@@ -108,7 +112,6 @@ $baris = mysqli_fetch_assoc($data_admin);
                         <td>Id buku</td>
                         <td>Nama peminjam</td>
                         <td>Tanggal peminjaman</td>
-                        <td>Tanggal pengembalian</td>
                         <td>aksi</td>
                       </tr>
                     </thead>
@@ -122,7 +125,6 @@ $baris = mysqli_fetch_assoc($data_admin);
                         <td><?= $row['id_buku'] ?></td>
                         <td><?= $row['nama_peminjam'] ?></td>
                         <td><?= $row['tp'] ?></td>
-                        <td><?= $row['tk'] ?></td>
                         <td>
                           <div class="action">
                             <button>
@@ -151,26 +153,52 @@ $baris = mysqli_fetch_assoc($data_admin);
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Form peminjaman buku</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <form method="post" action="" enctype="multipart/form-data">
             <div class="modal-body">
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="judul" />
-                <label for="floatingInput">judul buku</label>
-              </div>
+            
+          <div class="form-floating">
+              <select class="form-select mb-3" name="nama_peminjam" aria-label="Size 3 select example" required>
+                <option selected>peminjam</option>
+                <?php foreach($data_anggota as $member): ?>
+                <option value="<?= $member['nama'] ?>"><?= $member['nama'] ?></option>
+                <?php endforeach; ?>
+              </select>
+            <label for="floatingSelect">List peminjam</label>
+          </div>
 
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="nama_penulis" />
-                <label for="floatingInput">nama penulis</label>
-              </div>
+          <div class="form-floating">
+              <select class="form-select mb-3" name="nama_peminjam" aria-label="Size 3 select example" required>
+                <option selected>ID anggota</option>
+                <?php foreach($data_anggota as $member): ?>
+                <option value="<?= $member['id_anggota'] ?>"><?= $member['id_anggota'] ?> (<?= $member['nama'] ?>)</option>
+                <?php endforeach; ?>
+              </select>
+            <label for="floatingSelect">List id anggota</label>
+          </div>
 
-              <div class="col-mb-12 mb-3">
-                <label for="formFile" class="form-label">Masukan cover buku</label>
-                <input class="form-control" type="file" id="formFile" name="foto" required />
+          <div class="form-floating">
+              <select class="form-select mb-3" name="id_buku" aria-label="Size 3 select example" required>
+                <option selected>Buku</option>
+                <?php foreach($data_buku as $buku): ?>
+                <option value="<?= $buku['id_buku'] ?>"><?= $buku['id_buku'] ?> (<?= $buku['judul'] ?>)</option>
+                <?php endforeach; ?>
+              </select>
+            <label for="floatingSelect">List buku</label>
+          </div>
+
+          <div class="form-floating">
+              <input class="form-control" type="date" id="formFile" name="tp" required value="<?= $tanggalHariIni ?>" />
+            <label for="floatingSelect">Tanggal peminjaman</label>
+          </div>
+
+            <div class="col-mb-12 mb-3">
+                <input class="form-control" type="date" id="formFile" name="tk" hidden/>
               </div>
             </div>
+
             <div class="modal-footer">
               <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
 
@@ -179,7 +207,6 @@ $baris = mysqli_fetch_assoc($data_admin);
           </form>
         </div>
       </div>
-    </div>
     <script src="../Bootstrap/bootstrap.bundle.js"></script>
   </body>
 </html>

@@ -360,4 +360,39 @@ $conn = mysqli_connect("localhost", "root", "", "mypus");
         return mysqli_affected_rows($conn);
     }
 
+
+    function kembalikanBuku($data) {
+
+        global $conn;
+        $id = $data["id"];
+        // $nama_peminjam = $_POST['nama_peminjam'];
+        // $id_peminjam = $data['id_peminjam'];
+        $id_buku = $data['id_buku'];
+        // $tp = $data['tp'];
+        $tk = $data['tk'];
+        $status = "dikembalikan";
+
+        $query = "SELECT status FROM pinjam where id_buku = '$id_buku'";
+        $status_result = mysqli_query($conn, $query);
+        $result = mysqli_fetch_assoc($status_result);
+
+        if ($result['status'] == "dipinjam") {
+            $query = "UPDATE pinjam SET tk = '$tk', status = '$status' where id_buku = '$id_buku'";
+            $update_query = "UPDATE buku SET status = '$status' WHERE id_buku = '$id_buku'";
+            mysqli_query($conn, $query);
+            mysqli_query($conn, $update_query);
+            return mysqli_affected_rows($conn);
+        } else {
+            echo "<script>
+                    alert('buku sudah dikembalikan');
+                    document.location.href = '../memberPages/Pengembalian.php';
+                </script>";
+        }
+
+
+
+    }
+
+
+
 ?>

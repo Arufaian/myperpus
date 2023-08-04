@@ -20,6 +20,8 @@
         $tp = $_POST['tp'];
         // $tk = $_POST['tk'];
         $tk = "-";
+        $status = "dipinjam";
+
 
 
         $status_query = "SELECT status FROM buku WHERE id_buku = '$id_buku'";
@@ -28,13 +30,14 @@
 
           $row = mysqli_fetch_assoc($status_result);
           $status_buku = $row['status'];
+          // var_dump($status_buku);
+          // exit;
 
           if ($status_buku == 'tersedia') {
             // Status buku Tersedia, lanjutkan proses peminjaman
             // Kueri untuk menyimpan data peminjaman
-            $query = "INSERT INTO pinjam VALUES ('', '$id_peminjam', '$id_buku', ' $nama_peminjam', '$tp', '$tk')";
+            $query = "INSERT INTO pinjam VALUES ('', '$id_peminjam', '$id_buku', ' $nama_peminjam', '$tp', '$tk', '$status')";
             $result = mysqli_query($conn, $query);
-            $status = "dipinjam";
 
             if ($result) {
                 // Perbarui status buku menjadi "Disewa"
@@ -121,10 +124,10 @@
             <a href="#" class="active"><i class="bi bi-journal-arrow-up"></i> <span>Peminjaman</span></a>
           </li>
           <li>
-            <a href="#"><i class="bi bi-journal-arrow-down"></i> <span>Pengembalian</span></a>
+            <a href="Pengembalian.php"><i class="bi bi-journal-arrow-down"></i> <span>Pengembalian</span></a>
           </li>
           <li>
-          <a href="../config/logoutAnggota.php" onclick="confirm('Apakah anda ingin logout?');"><i class="bi bi-power"></i><span>Logout</span></a>
+            <a href="../config/logoutAnggota.php" onclick="return confirm('Apakah anda ingin Logout?');"><i class="bi bi-power"></i><span>Logout</span></a>
           </li>
         </ul>
       </div>
@@ -136,7 +139,7 @@
           <label for="nav-toggle">
             <i class="bi bi-list"></i>
           </label>
-          Koleksi buku
+          halaman peminjaman
         </h3>
         <div class="search-wrapper">
           <i class="bi bi-search"></i>
@@ -156,7 +159,7 @@
           <div class="projects">
             <div class="crd">
               <div class="crd-head">
-                <h2>Koleksi buku</h2>
+                <h2>List buku yang dipinjam</h2>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambah">Pinjam buku</button>
               </div>
               <div class="crd-body">
@@ -170,6 +173,7 @@
                         <td>Nama peminjam</td>
                         <td>Tanggal peminjaman</td>
                         <td>Tanggal pengembalian</td>
+                        <td>Status</td>
                       </tr>
                     </thead>
 
@@ -183,6 +187,7 @@
                         <td><?= $row['nama_peminjam'] ?></td>
                         <td><?= $row['tp'] ?></td>
                         <td><?= $row['tk'] ?></td>
+                        <td><?= $row['status'] ?></td>
                         <?php $i++; ?>
                         <?php endforeach; ?>
                       </tr>
@@ -201,7 +206,7 @@
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Form peminjaman buku</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <form method="post" action="" enctype="multipart/form-data">

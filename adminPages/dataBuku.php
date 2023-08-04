@@ -75,7 +75,7 @@ $baris = mysqli_fetch_assoc($data_admin);
             <a href="dataPeminjaman.php"><i class="bi bi-journal-arrow-up"></i><span>Data peminjaman</span></a>
           </li>
           <li>
-            <a href="#"><i class="bi bi-journal-arrow-down"></i><span>Data pengembalian</span></a>
+            <a href="dataPengembalian.php"><i class="bi bi-journal-arrow-down"></i><span>Data pengembalian</span></a>
           </li>
           <li>
             <a href="../config/logout.php" onclick="confirm('Apakah anda ingin logout?');"><i class="bi bi-power"></i><span>Logout</span></a>

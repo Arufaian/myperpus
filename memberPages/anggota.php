@@ -42,7 +42,7 @@
             <a href="pinjamBuku.php"><i class="bi bi-journal-arrow-up"></i> <span>Peminjaman</span></a>
           </li>
           <li>
-            <a href="#"><i class="bi bi-journal-arrow-down"></i> <span>Pengembalian</span></a>
+            <a href="Pengembalian.php"><i class="bi bi-journal-arrow-down"></i> <span>Pengembalian</span></a>
           </li>
           <li>
             <a href="../config/logoutAnggota.php" onclick="return confirm('Apakah anda ingin Logout?');"><i class="bi bi-power"></i><span>Logout</span></a>

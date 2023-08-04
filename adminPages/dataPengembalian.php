@@ -1,33 +1,16 @@
 <?php 
   require '../config/functions.php';
+session_start();
+if (!isset($_SESSION["id"])) {
+    header("Location:../loginpages/loginAdmin.php");
+}
 
-  session_start();
+$Sid = $_SESSION['id'];
+$data_admin = mysqli_query($conn, "SELECT * FROM admins WHERE id = $Sid");
+$baris = mysqli_fetch_assoc($data_admin);
 
-  if (!isset($_SESSION["key"])) {
-    header("Location:../loginpages/loginAnggota.php");
-  }
 
-  $Suid = $_SESSION['key'];
-  $data_admin = mysqli_query($conn, "SELECT * FROM anggota WHERE id = $Suid");
-  $baris = mysqli_fetch_assoc($data_admin);
-
-      if (isset($_POST["submit"])) {
-        // cek apakah data berhasil ditambahkan
-        if (tambahBuku($_POST) > 0) {
-            echo "<script>
-                    alert('Data berhasil ditambahkan');
-                    document.location.href = './dataBuku.php';
-                </script>";
-        } else {
-            echo "<script>
-                    alert('Data gagal ditambahkan');
-                    document.location.href = './dataBuku.php';
-                </script>";
-        }
-        
-    }
-
-  $books = query("SELECT * FROM buku");
+  $peminjam = query("SELECT * FROM pinjam");
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +19,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Koleksi buku</title>
+    <title>Data Pengembalian</title>
     <link rel="stylesheet" href="../Bootstrap/bootstrap.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="../css/dataBuku.css" />
@@ -61,19 +44,25 @@
       <div class="sidebar-menu">
         <ul>
           <li>
-            <a href="anggota.php"> <i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
+            <a href="admin.php"> <i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
           </li>
           <li>
-            <a href="#" class="active"><i class="bi bi-bookshelf"></i><span>Koleksi buku</span></a>
+            <a href="dataAdmin.php"><i class="bi bi-person"></i><span>Data admin</span></a>
           </li>
           <li>
-            <a href="pinjamBuku.php"><i class="bi bi-journal-arrow-up"></i> <span>Peminjaman</span></a>
+            <a href="dataAnggota.php"> <i class="bi bi-people"></i> <span>Data anggota</span></a>
           </li>
           <li>
-            <a href="Pengembalian.php"><i class="bi bi-journal-arrow-down"></i> <span>Pengembalian</span></a>
+            <a href="dataBuku.php"><i class="bi bi-bookshelf"></i><span>Data buku</span></a>
           </li>
-           <li>
-            <a href="../config/logoutAnggota.php" onclick="return confirm('Apakah anda ingin Logout?');"><i class="bi bi-power"></i><span>Logout</span></a>
+          <li>
+            <a href="dataPeminjaman.php"><i class="bi bi-journal-arrow-up"></i><span>Data peminjaman</span></a>
+          </li>
+          <li>
+            <a href="#" class="active"><i class="bi bi-journal-arrow-down"></i><span>Data pengembalian</span></a>
+          </li>
+          <li>
+            <a href="../config/logout.php" onclick="confirm('Apakah anda ingin logout?');"><i class="bi bi-power"></i><span>Logout</span></a>
           </li>
         </ul>
       </div>
@@ -85,16 +74,16 @@
           <label for="nav-toggle">
             <i class="bi bi-list"></i>
           </label>
-          Koleksi buku
+          Data Pengembalian
         </h3>
         <div class="search-wrapper">
           <i class="bi bi-search"></i>
           <input type="text" name="" id="" placeholder="search here" />
         </div>
         <div class="user-wrapper">
-          <img src="../adminPages/img/<?= $baris['foto'] ?>" width="40" height="40" alt="gambar user" />
+          <img src="./img/<?= $baris['foto'] ?>" width="40" height="40" alt="gambar user" />
           <div>
-            <h6><?= $baris['nama'] ?></h6>
+            <h6><?= $baris['nama_admin'] ?></h6>
             <small>admin</small>
           </div>
         </div>
@@ -105,32 +94,37 @@
           <div class="projects">
             <div class="crd">
               <div class="crd-head">
-                <h2>Koleksi buku</h2>
+                <h2>List peminjam</h2>
               </div>
+
               <div class="crd-body">
                 <div class="table-responsive">
                   <table class="table table-hover" id="dt" width="100%">
                     <thead>
                       <tr>
-                        <td>No</td>
+                       <td>No</td>
+                        <td>Id peminjam</td>
                         <td>Id buku</td>
-                        <td>Judul buku</td>
-                        <td>Cover buku</td>
-                        <td>Nama penulis</td>
+                        <td>Nama peminjam</td>
+                        <td>Tanggal peminjaman</td>
+                        <td>Tanggal pengembalian</td>
                         <td>Status</td>
+                        <td>aksi</td>
                       </tr>
                     </thead>
 
                     <tbody>
                       <?php $i = 1; ?>
-                      <?php foreach($books as $book) : ?>
+                      <?php foreach($peminjam as $row) : ?>
                       <tr>
                         <td><?= $i ?></td>
-                        <td><?= $book['id_buku'] ?></td>
-                        <td><?= $book['judul'] ?></td>
-                        <td><img src="../adminPages/img/<?= $book['foto'] ?>" alt="ehe" width="100"></td>
-                        <td><?= $book['nama_penulis'] ?></td>
-                        <td><?= $book['status'] ?></td>
+                        <td><?= $row['id_peminjam'] ?></td>
+                        <td><?= $row['id_buku'] ?></td>
+                        <td><?= $row['nama_peminjam'] ?></td>
+                        <td><?= $row['tp'] ?></td>
+                        <td><?= $row['tk'] ?></td>
+                        <td><?= $row['status'] ?></td>
+                        <td><a href="../config/selesaiPeminjaman.php?id_buku=<?= $row['id_buku'] ?>" class="btn btn-danger" onclick="return confirm('Apakah anda yakin?');">Selesai</a></td>
                         <?php $i++; ?>
                         <?php endforeach; ?>
                       </tr>
