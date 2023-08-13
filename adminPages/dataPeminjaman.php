@@ -11,11 +11,79 @@ $baris = mysqli_fetch_assoc($data_admin);
 // $nama_anggota = mysqli_query($conn, "SELECT nama FROM anggota");
 $data_anggota = query("SELECT * FROM anggota");
 $peminjam = query("SELECT * FROM pinjam");
-$data_buku = query('SELECT * FROM buku');
+$data_buku = query("SELECT * FROM buku WHERE status = 'tersedia'");
+
+
 $tanggalHariIni = date("Y-m-d");
+
+      if (isset($_POST["submit"])) {
+        // cek apakah data berhasil ditambahkan
+        $nama_peminjam = $_POST['nama_peminjam'];
+        $id_peminjam = $_POST['id_peminjam'];
+        $id_buku = $_POST['id_buku'];
+        $tp = $_POST['tp'];
+        // $tk = $_POST['tk'];
+        $tk = "-";
+        $status = "dipinjam";
+
+
+
+        $status_query = "SELECT status FROM buku WHERE id_buku = '$id_buku'";
+        $status_result = mysqli_query($conn, $status_query);
+        if ($status_result) {
+
+          $row = mysqli_fetch_assoc($status_result);
+          $status_buku = $row['status'];
+          // var_dump($status_buku);
+          // exit;
+
+          if ($status_buku == 'tersedia') {
+            // Status buku Tersedia, lanjutkan proses peminjaman
+            // Kueri untuk menyimpan data peminjaman
+            $query = "INSERT INTO pinjam VALUES ('', '$id_peminjam', '$id_buku', ' $nama_peminjam', '$tp', '$tk', '$status')";
+            $result = mysqli_query($conn, $query);
+
+            if ($result) {
+                // Perbarui status buku menjadi "Disewa"
+                $update_query = "UPDATE buku SET status = '$status' WHERE id_buku = '$id_buku'";
+                $update_result = mysqli_query($conn, $update_query);
+                echo "<script>
+                    alert('Berhasil melakukan peminjaman buku');
+                    document.location.href = './dataPeminjaman.php';
+                </script>";
+
+
+              
+            } else {
+
+              echo "<script>
+                    alert('Data tidak valid');
+                    document.location.href = './dataPeminjaman.php';
+                </script>";
+              
+            }
+
+          } else {
+              echo "<script>
+                    alert('Buku sedang dipinjam');
+                    document.location.href = './dataPeminjaman.php';
+                </script>";
+          }
+
+        } else {
+
+                echo "<script>
+                    alert('Buku tidak ada');
+                    document.location.href = './dataPeminjaman.php';
+                </script>";
+        }
+        
+    }
 
 
 ?>
+
+<link rel="stylesheet" href="">
 
 <!DOCTYPE html>
 <html lang="en">
@@ -127,12 +195,9 @@ $tanggalHariIni = date("Y-m-d");
                         <td><?= $row['tp'] ?></td>
                         <td>
                           <div class="action">
-                            <button>
-                              <a href="../config/editBuku.php?id_buku=<?= $row['id_buku'] ?>"><i class="bi bi-pencil"></i></a>
-                            </button>
-                            <button onclick="return confirm('Apakah anda ingin menghapus data peminjaman?');">
-                              <a href="../config/hapusPeminjaman.php?id_buku=<?= $row['id_buku'] ?>"><i class="bi bi-trash"></i></a>
-                            </button>
+                            <a class="btn btn-warning" href="../config/editPeminjaman.php?id_buku=<?= $row['id_buku'] ?>"><i class="bi bi-pencil"></i></a>
+
+                            <a class="btn btn-danger" href="../config/hapusPeminjaman.php?id_buku=<?= $row['id_buku'] ?>" onclick="return confirm('Apakah anda ingin menghapus data peminjaman?');"><i class="bi bi-trash"></i></a>
                           </div>
                         </td>
                         <?php $i++; ?>
@@ -166,11 +231,11 @@ $tanggalHariIni = date("Y-m-d");
                 <option value="<?= $member['nama'] ?>"><?= $member['nama'] ?></option>
                 <?php endforeach; ?>
               </select>
-            <label for="floatingSelect">List peminjam</label>
+            <label for="floatingSelect">List nama anggota</label>
           </div>
 
           <div class="form-floating">
-              <select class="form-select mb-3" name="nama_peminjam" aria-label="Size 3 select example" required>
+              <select class="form-select mb-3" name="id_peminjam" aria-label="Size 3 select example" required>
                 <option selected>ID anggota</option>
                 <?php foreach($data_anggota as $member): ?>
                 <option value="<?= $member['id_anggota'] ?>"><?= $member['id_anggota'] ?> (<?= $member['nama'] ?>)</option>
@@ -186,7 +251,7 @@ $tanggalHariIni = date("Y-m-d");
                 <option value="<?= $buku['id_buku'] ?>"><?= $buku['id_buku'] ?> (<?= $buku['judul'] ?>)</option>
                 <?php endforeach; ?>
               </select>
-            <label for="floatingSelect">List buku</label>
+            <label for="floatingSelect">List buku yang tersedia</label>
           </div>
 
           <div class="form-floating">

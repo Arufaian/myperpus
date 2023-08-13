@@ -360,6 +360,53 @@ $conn = mysqli_connect("localhost", "root", "", "mypus");
         return mysqli_affected_rows($conn);
     }
 
+    function updatePeminjam($data) {
+
+        global $conn;
+
+        // get id buku lama
+        $getID = $_GET['id_buku'];
+
+        $nama_peminjam = $data['nama_peminjam'];
+        $id_peminjam = $data['id_peminjam'];
+        $id_buku = $data['id_buku'];
+        $tp = $data['tp'];
+
+        if ($id_buku == $getID) {
+            // query update buku
+            $queryBukuLama = "UPDATE buku SET 
+            status = 'dipinjam' WHERE id_buku = '$getID'";
+            mysqli_query($conn, $queryBukuLama);
+            
+            
+            // $status = "dipinjam";
+            
+        } else {
+            
+            $queryBukuLama = "UPDATE buku SET 
+            status = 'tersedia' WHERE id_buku = '$getID'";
+            mysqli_query($conn, $queryBukuLama);
+
+        }
+
+        // query update buku
+        $queryBukuBaru = "UPDATE buku SET 
+        status = 'dipinjam' where id_buku = '$id_buku'";
+
+        // query update peminjam
+        $queryPeminjam = "UPDATE pinjam SET
+        nama_peminjam = '$nama_peminjam', id_peminjam = '$id_peminjam', id_buku = '$id_buku', tp = '$tp' WHERE id_buku = '$getID'";
+
+
+
+
+        mysqli_query($conn, $queryBukuBaru);
+        mysqli_query($conn, $queryPeminjam);
+
+        
+        return mysqli_affected_rows($conn);
+    }
+
 
     function kembalikanBuku($data) {
 

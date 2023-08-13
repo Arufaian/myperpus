@@ -30,6 +30,12 @@ $result = mysqli_query($conn, $query);
 $row = mysqli_fetch_assoc($result);
 $jumlahBuku = $row['total_buku'];
 
+// menghitung jumlah peminjam
+$query = "SELECT COUNT(*) AS total_peminjam FROM pinjam";
+$result = mysqli_query($conn, $query);
+$row = mysqli_fetch_assoc($result);
+$jumlahPeminjam = $row['total_peminjam'];
+
 
 $bukuTerbaru = query("SELECT * FROM buku ORDER BY id DESC LIMIT 5");
 
@@ -47,7 +53,7 @@ $anggotaTerbaru = query('SELECT * FROM anggota ORDER BY id DESC LIMIT 5')
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin page</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="../Bootstrap/bootstrap.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="../css/admin_st.css">
@@ -74,10 +80,10 @@ $anggotaTerbaru = query('SELECT * FROM anggota ORDER BY id DESC LIMIT 5')
             <a href="dataBuku.php"><i class="bi bi-bookshelf"></i><span>Data buku</span></a>
           </li>
           <li>
-            <a href="#"><i class="bi bi-journal-arrow-up"></i><span>Data peminjaman</span></a>
+            <a href="dataPeminjaman.php"><i class="bi bi-journal-arrow-up"></i><span>Data peminjaman</span></a>
           </li>
           <li>
-            <a href="#"><i class="bi bi-journal-arrow-down"></i><span>Data pengembalian</span></a>
+            <a href="dataPengembalian.php"><i class="bi bi-journal-arrow-down"></i><span>Data pengembalian</span></a>
           </li>
           <li>
             <a href="../config/logout.php" onclick="confirm('Apakah anda ingin logout?');"><i class="bi bi-power"></i><span>Logout</span></a>
@@ -138,11 +144,11 @@ $anggotaTerbaru = query('SELECT * FROM anggota ORDER BY id DESC LIMIT 5')
           </div>
           <div class="card-single">
             <div>
-              <h1>54</h1>
-              <span>income</span>
+              <h1><?= $jumlahPeminjam ?></h1>
+              <span>Peminjam</span>
             </div>
             <div>
-              <i class="bi bi-display"></i>
+              <i class="bi bi-journal-arrow-up"></i>
             </div>
           </div>
         </div>
